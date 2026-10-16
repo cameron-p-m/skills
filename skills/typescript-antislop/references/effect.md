@@ -1,0 +1,11 @@
+# Optional Effect rules
+
+Apply these five `anti-slop-effect/*` rules only in code that already uses Effect. Do not add Effect to satisfy anti-slop. Use APIs available in the installed version; do not introduce an API based only on an upstream example.
+
+- **`no-manual-effect-error-tag`**: In broad `Effect.catch`, `Effect.catchAll`, or `Effect.catchIf` handlers, replace manual `_tag` comparisons and switches with the matching tagged-error operator, such as `Effect.catchTag`. For a tagged reason, consider `Effect.catchReason` or `Effect.catchReasons` where available. Preserve which errors are recovered, propagated, or transformed.
+- **`no-manual-tag-comparison`**: Replace direct `_tag` comparisons and switches with `Match`, `Predicate.isTagged`, or the existing tagged-enum matcher. Preserve exhaustiveness, fallback behavior, and narrowing. This is an Effect policy, not a general ban on TypeScript discriminated unions.
+- **`no-manual-tagged-construction`**: Replace literal `_tag` object construction with the existing Schema, tagged class/error, or `Data.taggedEnum` constructor. Object patterns passed directly to `Match.when` and `Match.not` are allowed. Preserve validation, defaults, and error behavior when changing constructors.
+- **`no-service-constructor-imports`**: Runtime code should import the owning Layer and obtain the contextual service instead of importing a named `make<CapabilityName>` constructor from a relative project module. Upstream exempts `*.test.*` and `*.spec.*`; package imports, path aliases, default imports, and static constructors such as `WorkspaceName.make` are outside detection. Moving the same import to an alias is not an architectural fix. Preserve Layer lifetime, acquisition, and release behavior.
+- **`prefer-effect-match`**: Replace chained literal ternaries over the same value with `Match`. Preserve the fallback and the number and order of evaluations. Do not repeatedly or eagerly evaluate an effectful expression during a rewrite.
+
+Upstream checks syntax, including exact `Effect` and `Match` identifiers, rather than proving import identity or exhaustiveness. Verify the actual imports and installed APIs during manual review; distinguish broader recommendations from exact lint matches.
